@@ -27,17 +27,16 @@ SOFTWARE.
 // https://github.com/thomasfredericks/Bounce2
 #include <Bounce2.h>
 
-const int buttonTrigger = 2;
-const int buttonMode = 3;
-const int buttonReload = 4;
-const int ledBlaster = 13;
-const int ledStun = 13;
+#define BUTTON_TRIGGER 2
+#define BUTTON_MODE 3
+#define BUTTON_RELOAD 4
 
-const int BLAST_DELAY = 300;
-const int STUN_DELAY = 300;
+#define LED_BLASTER 13
+#define LED_STUN 13
 
-
-const int maxAmmo = 10; // LED has 10 segements so 10 shots!
+#define BLAST_DELAY 300
+#define STUN_DELAY 300
+#define MAX_AMMO 10 // LED has 10 segements so 10 shots!
 
 int ammoCount = 0;
 boolean stunMode = false;
@@ -50,21 +49,21 @@ void setup() {
   Serial.begin(9600);
 
   // Setup all the input buttons.
-  pinMode(buttonTrigger, INPUT);
-  pinMode(buttonReload, INPUT);
-  pinMode(buttonMode, INPUT);
+  pinMode(BUTTON_TRIGGER, INPUT);
+  pinMode(BUTTON_RELOAD, INPUT);
+  pinMode(BUTTON_MODE, INPUT);
 
   // Setup all the outputs and write a default state.
-  pinMode(ledBlaster, OUTPUT);
-  pinMode(ledStun, OUTPUT);
+  pinMode(LED_BLASTER, OUTPUT);
+  pinMode(LED_STUN, OUTPUT);
 
-  digitalWrite(ledBlaster, LOW);
-  digitalWrite(ledStun, LOW);
+  digitalWrite(LED_BLASTER, LOW);
+  digitalWrite(LED_STUN, LOW);
 
   // Setup the debouncers.
-  debouncerTrigger.attach(buttonTrigger);
-  debouncerMode.attach(buttonMode);
-  debouncerReload.attach(buttonReload);
+  debouncerTrigger.attach(BUTTON_TRIGGER);
+  debouncerMode.attach(BUTTON_MODE);
+  debouncerReload.attach(BUTTON_RELOAD);
 
   // Now core init is done do any run once on load stuff
   ReloadBlaster();
@@ -104,10 +103,10 @@ void PullTrigger(){
     int delayTime;
 
     if (stunMode) {
-      ledPin = ledStun;
+      ledPin = LED_STUN;
       delayTime = STUN_DELAY;
     } else {
-      ledPin = ledBlaster;
+      ledPin = LED_BLASTER;
       delayTime = BLAST_DELAY;
     }
 
@@ -149,7 +148,7 @@ void ReloadBlaster(){
   // Play reload noise and cycle the lights on the 10 segment.
 
   // Reset the ammo counter.
-  ammoCount = maxAmmo;
+  ammoCount = MAX_AMMO;
   UpdateAmmoDisplay();
 }
 
