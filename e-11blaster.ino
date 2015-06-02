@@ -49,9 +49,9 @@ void setup() {
   Serial.begin(9600);
 
   // Setup all the input buttons.
-  pinMode(BUTTON_TRIGGER, INPUT);
-  pinMode(BUTTON_RELOAD, INPUT);
-  pinMode(BUTTON_MODE, INPUT);
+  pinMode(BUTTON_TRIGGER, INPUT_PULLUP);
+  pinMode(BUTTON_RELOAD, INPUT_PULLUP);
+  pinMode(BUTTON_MODE, INPUT_PULLUP);
 
   // Setup all the outputs and write a default state.
   pinMode(LED_BLASTER, OUTPUT);
@@ -72,9 +72,9 @@ void setup() {
 void loop() {
   // These are events that can happen in each loop.
   // Read the values from the debouncer and act accordingly
-  boolean fire = debouncerTrigger.update() && debouncerTrigger.rose();
-  boolean changeMode = debouncerMode.update() && debouncerMode.rose();
-  boolean reload = debouncerReload.update() && debouncerReload.rose();
+  boolean fire = debouncerTrigger.update() && debouncerTrigger.fell();
+  boolean changeMode = debouncerMode.update() && debouncerMode.fell();
+  boolean reload = debouncerReload.update() && debouncerReload.fell();
 
   // Act on the current state of the world
 
