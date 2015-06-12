@@ -12,5 +12,6 @@ probably should have a reasonable idea of what you're doing!
  * Load up `e-11blaster.ino` in Arduino.
  * Configure Arduino as appropriate for your hardware and then upload.
 
-**Acknowledgements**
+##Acknowledgements
+ * Inspired by work done by *skyone* and others on [FISD](http://http://www.whitearmor.net)
  * [BOUNCE 2](https://github.com/thomasfredericks/Bounce2) - debouncing library.

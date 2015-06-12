@@ -31,12 +31,14 @@ SOFTWARE.
 #define BUTTON_MODE 3
 #define BUTTON_RELOAD 4
 
+#define LED_POWER 11
 #define LED_BLASTER 13
 #define LED_STUN 13
 
 #define BLAST_DELAY 300
 #define STUN_DELAY 300
 #define MAX_AMMO 10 // LED has 10 segements so 10 shots!
+#define FLASH_MILLIS 3000
 
 int ammoCount = 0;
 boolean stunMode = false;
@@ -54,9 +56,11 @@ void setup() {
   pinMode(BUTTON_MODE, INPUT_PULLUP);
 
   // Setup all the outputs and write a default state.
+  pinMode(LED_POWER, OUTPUT);
   pinMode(LED_BLASTER, OUTPUT);
   pinMode(LED_STUN, OUTPUT);
 
+  analogWrite(LED_POWER, 0);
   digitalWrite(LED_BLASTER, LOW);
   digitalWrite(LED_STUN, LOW);
 
@@ -78,6 +82,8 @@ void loop() {
 
   // Act on the current state of the world
 
+  SetPowerLED();
+
   // Only do 1 job at a time, we don't want to fire reload and change mode at
   // once! 1 it makes no sence and 2 it would sound horrific.
   // * Reloading will cancel a mode change.
@@ -91,6 +97,21 @@ void loop() {
     PullTrigger();
   }
 
+}
+
+void SetPowerLED() {
+  // Start with the LEDs
+  if (!stunMode) {
+    // Normal mode so power on full
+    analogWrite(LED_POWER, 255);
+  } else {
+    // Stun mode so pulse the LED over 3 seconds
+    // Maths magic will give us a value 0-255 we can pass into to the
+    // analogWrite.
+    double v = 128 + 127 * sin(2 * PI / FLASH_MILLIS * millis());
+
+    analogWrite(LED_POWER, (int)v);
+  }
 }
 
 void PullTrigger(){
