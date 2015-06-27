@@ -27,6 +27,10 @@ SOFTWARE.
 // https://github.com/thomasfredericks/Bounce2
 #include <Bounce2.h>
 
+// Grove 10 segment LED driver
+// https://github.com/Seeed-Studio/Grove_LED_Bar
+#include <Grove_LED_Bar.h>
+
 #define BUTTON_TRIGGER 2
 #define BUTTON_MODE 3
 #define BUTTON_RELOAD 4
@@ -34,6 +38,10 @@ SOFTWARE.
 #define LED_POWER 11
 #define LED_BLASTER 13
 #define LED_STUN 13
+
+#define BAR_DATA 5
+#define BAR_CLOCK 6
+#define BAR_ORIENTATION 0
 
 #define BLAST_DELAY 300
 #define STUN_DELAY 300
@@ -46,6 +54,8 @@ boolean stunMode = false;
 Bounce debouncerTrigger = Bounce();
 Bounce debouncerMode = Bounce();
 Bounce debouncerReload = Bounce();
+
+Grove_LED_Bar bar(BAR_CLOCK, BAR_DATA, BAR_ORIENTATION);
 
 void setup() {
   Serial.begin(9600);
@@ -68,6 +78,10 @@ void setup() {
   debouncerTrigger.attach(BUTTON_TRIGGER);
   debouncerMode.attach(BUTTON_MODE);
   debouncerReload.attach(BUTTON_RELOAD);
+
+  // Setup 10 segment display
+  bar.begin();
+  ClearDisplay();
 
   // Now core init is done do any run once on load stuff
   ReloadBlaster();
@@ -149,6 +163,7 @@ void PullTrigger(){
     // todo Play empty sound
     // todo Flash the ammo display to highlight we're empty whilst the sound plays.
     Serial.println("Empty!");
+    FlashDisplay();
   }
 }
 
@@ -177,4 +192,21 @@ void UpdateAmmoDisplay(){
   // todo display ammo to 10 segment.
   Serial.print("Ammo : ");
   Serial.println(ammoCount);
+  SetDisplay(ammoCount);
+}
+
+// LED bar helper functions.
+void ClearDisplay(){bar.setLevel(0);}
+void FillDisplay(){bar.setLevel(10);}
+void SetDisplay(int count){bar.setLevel(count);}
+
+void FlashDisplay(){
+  for (int i = 0 ; i < 2 ; i++){
+    FillDisplay();
+    delay(300);
+    ClearDisplay();
+    delay(300);
+  }
+  // Reset the display back to where it was.
+  UpdateAmmoDisplay();
 }
