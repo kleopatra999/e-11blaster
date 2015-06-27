@@ -43,10 +43,15 @@ SOFTWARE.
 #define BAR_CLOCK 6
 #define BAR_ORIENTATION 0
 
-#define BLAST_DELAY 300
-#define STUN_DELAY 300
+#define DELAY_BLAST 300
+#define DELAY_STUN 300
 #define MAX_AMMO 10 // LED has 10 segements so 10 shots!
 #define FLASH_MILLIS 3000
+
+#define SOUND_BLAST 1
+#define SOUND_STUN 2
+#define SOUND_EMPTY 3
+#define SOUND_RELOAD 4
 
 int ammoCount = 0;
 boolean stunMode = false;
@@ -73,6 +78,9 @@ void setup() {
   analogWrite(LED_POWER, 0);
   digitalWrite(LED_BLASTER, LOW);
   digitalWrite(LED_STUN, LOW);
+
+  // Initialise the sound volume in the range 0-31
+  SetVolume(28);
 
   // Setup the debouncers.
   debouncerTrigger.attach(BUTTON_TRIGGER);
@@ -129,27 +137,27 @@ void SetPowerLED() {
 }
 
 void PullTrigger(){
-  Serial.println("Trigger pulled");
 
   if (ammoCount > 0) {
-    Serial.println("Shoot!");
 
     int ledPin;
     int delayTime;
-
-    if (stunMode) {
-      ledPin = LED_STUN;
-      delayTime = STUN_DELAY;
-    } else {
-      ledPin = LED_BLASTER;
-      delayTime = BLAST_DELAY;
-    }
+    byte sound;
 
     // Light up the blaster!
     digitalWrite(ledPin, HIGH);
 
-    // todo Play sound here!
+    if (stunMode){
+      delayTime = DELAY_STUN;
+      ledPin = LED_STUN;
+      sound = SOUND_STUN;
+    } else {
+      delayTime = DELAY_BLAST;
+      ledPin = DELAY_BLAST;
+      sound = SOUND_BLAST;
+    }
 
+    PlayTrack(sound);
     // Wait for the sound to play)
     delay(delayTime);
     // Turn off the blaster.
@@ -160,9 +168,8 @@ void PullTrigger(){
     UpdateAmmoDisplay();
   } else {
     // Empty!
-    // todo Play empty sound
-    // todo Flash the ammo display to highlight we're empty whilst the sound plays.
-    Serial.println("Empty!");
+    PlayTrack(SOUND_EMPTY);
+    // Flash the ammo display to highlight we're empty whilst the sound plays.
     FlashDisplay();
   }
 }
@@ -170,18 +177,12 @@ void PullTrigger(){
 void ToggleMode(){
   // Simple two state modle so just toggle the mode
   stunMode = !stunMode;
-
-  Serial.print("Mode Switch : ");
-  if (stunMode){
-    Serial.println("stun");
-  } else {
-    Serial.println("blast");
-  }
 }
 
 void ReloadBlaster(){
-  Serial.println("Reloading!");
   // Play reload noise and cycle the lights on the 10 segment.
+  PlayTrack(SOUND_RELOAD);
+  // Cycle LEDs
 
   // Reset the ammo counter.
   ammoCount = MAX_AMMO;
@@ -189,9 +190,6 @@ void ReloadBlaster(){
 }
 
 void UpdateAmmoDisplay(){
-  // todo display ammo to 10 segment.
-  Serial.print("Ammo : ");
-  Serial.println(ammoCount);
   SetDisplay(ammoCount);
 }
 
@@ -209,4 +207,22 @@ void FlashDisplay(){
   }
   // Reset the display back to where it was.
   UpdateAmmoDisplay();
+}
+
+// Sound helper functions
+void SetVolume(byte vol){
+  Serial.write(0x7E); // Start
+  Serial.write(0x03); // Length
+  Serial.write(0xA7); // Command
+  Serial.write(vol); // Volume 00-31
+  Serial.write(0x7E); // End
+}
+
+void PlayTrack(byte track){
+  Serial.write(0x7E); // Start
+  Serial.write(0x04); // Length
+  Serial.write(0xA0); // SD Card
+  Serial.write(0x00); // High Byte
+  Serial.write(track); // Low Byte
+  Serial.write(0x7E); // End
 }
