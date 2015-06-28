@@ -30,6 +30,6 @@ probably should have a reasonable idea of what you're doing!
 ![Schemeatic](/Docs/e-11blaster_schem.png)
 
 ##Acknowledgements
- * Inspired by work done by *skyone* and others on [FISD](http://http://www.whitearmor.net)
+ * Inspired by work done by *skyone* and others on [FISD](http://www.whitearmor.net)
  * [BOUNCE 2](https://github.com/thomasfredericks/Bounce2) - debouncing library.
  * [Grove LED Bar](https://github.com/Seeed-Studio/Grove_LED_Bar) - 10 Segement LED driver
