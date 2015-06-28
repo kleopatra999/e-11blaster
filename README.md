@@ -9,6 +9,7 @@ probably should have a reasonable idea of what you're doing!
  * Download and install [Arduino editor](http://www.arduino.cc/en/Main/Software)
  * Download this project
  * Download and install [BOUNCE 2](https://github.com/thomasfredericks/Bounce2)
+ * Download and install [Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
  * Load up `e-11blaster.ino` in Arduino.
  * Configure Arduino as appropriate for your hardware and then upload.
 
@@ -32,4 +33,5 @@ probably should have a reasonable idea of what you're doing!
 ##Acknowledgements
  * Inspired by work done by *skyone* and others on [FISD](http://www.whitearmor.net)
  * [BOUNCE 2](https://github.com/thomasfredericks/Bounce2) - debouncing library.
- * [Grove LED Bar](https://github.com/Seeed-Studio/Grove_LED_Bar) - 10 Segement LED driver
+ * [Grove LED Bar](https://github.com/Seeed-Studio/Grove_LED_Bar) - 10 Segement LED driver.
+ * [Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Super bright RGB LED.

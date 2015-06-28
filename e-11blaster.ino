@@ -31,20 +31,23 @@ SOFTWARE.
 // https://github.com/Seeed-Studio/Grove_LED_Bar
 #include <Grove_LED_Bar.h>
 
+// AdaFruit Neo Pixel
+// https://github.com/adafruit/Adafruit_NeoPixel
+#include <Adafruit_NeoPixel.h>
+
 #define BUTTON_TRIGGER 2
 #define BUTTON_MODE 3
 #define BUTTON_RELOAD 4
 
 #define LED_POWER 11
-#define LED_BLASTER 13
-#define LED_STUN 13
+#define LED_BLASTER 7
 
 #define BAR_DATA 5
 #define BAR_CLOCK 6
 #define BAR_ORIENTATION 0
 
-#define DELAY_BLAST 300
-#define DELAY_STUN 300
+#define DELAY_BLAST 1000
+#define DELAY_STUN 1100
 #define MAX_AMMO 10 // LED has 10 segements so 10 shots!
 #define FLASH_MILLIS 3000
 
@@ -52,6 +55,8 @@ SOFTWARE.
 #define SOUND_STUN 2
 #define SOUND_EMPTY 3
 #define SOUND_RELOAD 4
+
+#define PIX_NUM 1
 
 int ammoCount = 0;
 boolean stunMode = false;
@@ -62,6 +67,8 @@ Bounce debouncerReload = Bounce();
 
 Grove_LED_Bar bar(BAR_CLOCK, BAR_DATA, BAR_ORIENTATION);
 
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIX_NUM, LED_BLASTER, NEO_GRB + NEO_KHZ800);
+
 void setup() {
   Serial.begin(9600);
 
@@ -70,14 +77,9 @@ void setup() {
   pinMode(BUTTON_RELOAD, INPUT_PULLUP);
   pinMode(BUTTON_MODE, INPUT_PULLUP);
 
-  // Setup all the outputs and write a default state.
+  // Setup the power LED and default it to off.
   pinMode(LED_POWER, OUTPUT);
-  pinMode(LED_BLASTER, OUTPUT);
-  pinMode(LED_STUN, OUTPUT);
-
   analogWrite(LED_POWER, 0);
-  digitalWrite(LED_BLASTER, LOW);
-  digitalWrite(LED_STUN, LOW);
 
   // Initialise the sound volume in the range 0-31
   SetVolume(28);
@@ -90,6 +92,11 @@ void setup() {
   // Setup 10 segment display
   bar.begin();
   ClearDisplay();
+
+  // Setup Neo pixels
+  pixels.begin();
+  /*pixels.setBrightness(255); // max out the brightness*/
+  pixels.show(); // Initialise to off
 
   // Now core init is done do any run once on load stuff
   ReloadBlaster();
@@ -145,23 +152,22 @@ void PullTrigger(){
     byte sound;
 
     // Light up the blaster!
-    digitalWrite(ledPin, HIGH);
 
     if (stunMode){
       delayTime = DELAY_STUN;
-      ledPin = LED_STUN;
       sound = SOUND_STUN;
+      SetPixelBlue();
     } else {
       delayTime = DELAY_BLAST;
-      ledPin = DELAY_BLAST;
       sound = SOUND_BLAST;
+      SetPixelRed();
     }
 
     PlayTrack(sound);
     // Wait for the sound to play)
     delay(delayTime);
     // Turn off the blaster.
-    digitalWrite(ledPin, LOW);
+    SetPixelOff();
 
     // Decrement ammo count and update the display.
     ammoCount--;
@@ -226,3 +232,15 @@ void PlayTrack(byte track){
   Serial.write(track); // Low Byte
   Serial.write(0x7E); // End
 }
+
+// Pixels helper FUNCTIONS
+void SetPixelRGB(byte r, byte g, byte b){
+  for(int i = 0 ; i < PIX_NUM ; i++){
+    pixels.setPixelColor(i, pixels.Color(r,g,b));
+  }
+  pixels.show();
+}
+
+void SetPixelBlue(){SetPixelRGB(0, 0, 255);}
+void SetPixelRed(){SetPixelRGB(255, 0, 0);}
+void SetPixelOff(){SetPixelRGB(0, 0, 0);}
